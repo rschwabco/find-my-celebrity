@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/router";
 import { Camera, CameraType } from "react-camera-pro";
 import {
   Container,
@@ -77,12 +76,12 @@ export default function Home() {
   };
 
   return (
-    <Container css={{ height: "100vh" }}>
+    <Container>
       <Container gap={2} justify="center">
         <Col css={{ justifyContent: "center", padding: 20 }}>
           <Row justify="center">
             <Text
-              css={{ textGradient: "45deg, $blue600 -20%, $pink600 50%" }}
+              css={{ textGradient: "45deg, $blue600 20%, $green600 50%" }}
               h1
               weight="extrabold"
             >
@@ -118,7 +117,83 @@ export default function Home() {
         </Col>
       </Container>
       <Container gap={2}>
-        <Row justify="center">
+        <Grid.Container>
+          {results &&
+            results.map((result, key) => {
+              return (
+                <Grid xs={4} key={key} css={{ justifyContent: "center" }}>
+                  <Row justify="center" gap={3}>
+                    <Card
+                      isPressable
+                      isHoverable
+                      disableRipple
+                      variant="bordered"
+                      onPress={() => {
+                        window.open(
+                          `${profilePath}${result?.metadata?.id}`,
+                          "_blank"
+                        );
+                      }}
+                    >
+                      <Card.Header css={{ zIndex: 1, top: 5 }}>
+                        <Grid.Container>
+                          <Grid xs={9}>
+                            <Link
+                              color="primary"
+                              target="_blank"
+                              href={`${profilePath}${result?.metadata?.id}`}
+                              underline
+                            >
+                              <Text size={18} color="#ffffffAA">
+                                {result?.metadata?.name}
+                              </Text>
+                            </Link>
+                          </Grid>
+                        </Grid.Container>
+                      </Card.Header>
+
+                      <Card.Divider />
+                      <Card.Image
+                        src={`${imagePath}${result?.metadata?.profile_path}`}
+                        alt="profile"
+                        objectFit="cover"
+                        autoResize
+                        loading={"lazy"}
+                      ></Card.Image>
+                      <Card.Footer>
+                        <Col css={{ marginLeft: -20 }}>
+                          <Row>
+                            <Text>
+                              <b>{`Confidence: `}</b>
+                              {result?.confidence &&
+                                (result.confidence * 100).toFixed(2)}
+                              %
+                            </Text>
+                          </Row>
+                          <Row>
+                            <Text>
+                              <b>{`Birthday: `}</b>
+                              {result?.metadata?.birthday.replace(
+                                "None",
+                                "Unknown"
+                              )}
+                            </Text>
+                          </Row>
+                          <Row>
+                            <Text>
+                              <b>{`Popularity: `}</b>
+                              {result?.metadata?.popularity}
+                            </Text>
+                          </Row>
+                        </Col>
+                      </Card.Footer>
+                    </Card>
+                  </Row>
+                </Grid>
+              );
+            })}
+        </Grid.Container>
+        {/* <Row justify="center">
           {results &&
             results.map((result, key) => {
               return (
@@ -180,7 +255,7 @@ export default function Home() {
                 </Col>
               );
             })}
-        </Row>
+        </Row> */}
       </Container>
     </Container>
   );
