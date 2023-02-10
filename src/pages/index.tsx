@@ -1,22 +1,24 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Camera, CameraType } from "react-camera-pro";
 import { useRouter } from "next/router";
+import { Camera, CameraType } from "react-camera-pro";
 import {
   Container,
   Card,
   Row,
   Text,
   Col,
+  Link,
   Button,
   Spacer,
   Grid,
-  css,
   Image as NextImage,
   Loading,
 } from "@nextui-org/react";
 const imagePath = `https://image.tmdb.org/t/p/h632/`;
+const profilePath = `https://www.themoviedb.org/person/`;
 
 type Profile = {
+  id: string;
   birthday: string;
   name: string;
   place_of_birth: string;
@@ -36,8 +38,6 @@ export default function Home() {
   const camera = useRef<CameraType>(null);
   const [numberOfCameras, setNumberOfCameras] = useState(0);
   const [image, setImage] = useState(null);
-
-  // const [profiles, setProfiles] = useState<Profile[]>(null);
   const [results, setResults] = useState<QueryResult[] | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -54,16 +54,14 @@ export default function Home() {
             image,
           }),
         });
-        setLoading(false);
         const { results } = await result.json();
-        console.log("RES", results);
+        setLoading(false);
         setResults(results);
       });
     }
   };
 
   const rotateImage = (imageBase64: string, rotation: number, cb: Function) => {
-    //@ts-ignore
     var img = new Image();
     img.src = imageBase64;
     img.onload = () => {
@@ -83,7 +81,13 @@ export default function Home() {
       <Container gap={2} justify="center">
         <Col css={{ justifyContent: "center", padding: 20 }}>
           <Row justify="center">
-            <Text h1>Find your Celebrity</Text>
+            <Text
+              css={{ textGradient: "45deg, $blue600 -20%, $pink600 50%" }}
+              h1
+              weight="extrabold"
+            >
+              Find your Celebrity
+            </Text>
           </Row>
           <Row justify="center">
             <Card css={{ width: "60%" }}>
@@ -113,54 +117,64 @@ export default function Home() {
           </Row>
         </Col>
       </Container>
-      <Container css={{ height: "60vh" }}>
+      <Container gap={2}>
         <Row justify="center">
           {results &&
             results.map((result, key) => {
               return (
                 <Col key={key} css={{ justifyContent: "center" }}>
-                  <Row justify="center">
-                    <Card css={{ height: "60%", width: "60%", margin: 10 }}>
-                      <NextImage
+                  <Row justify="center" gap={3}>
+                    <Card css={{ margin: 30 }}>
+                      <Card.Header css={{ zIndex: 1, top: 5 }}>
+                        <Grid.Container>
+                          <Grid xs={8}>
+                            <Link
+                              color="primary"
+                              target="_blank"
+                              href={`${profilePath}${result?.metadata?.id}`}
+                            >
+                              <Text size={18} color="#ffffffAA">
+                                {result?.metadata?.name}
+                              </Text>
+                            </Link>
+                          </Grid>
+                          <Grid xs={4} justify="flex-end">
+                            <Text>
+                              (
+                              {result?.confidence &&
+                                (result.confidence * 100).toFixed(2)}
+                              %)
+                            </Text>
+                          </Grid>
+                        </Grid.Container>
+                      </Card.Header>
+
+                      <Card.Divider />
+                      <Card.Image
                         src={`${imagePath}${result?.metadata?.profile_path}`}
                         alt="profile"
                         objectFit="cover"
                         autoResize
-                      />
-                    </Card>
-                  </Row>
-                  <Row justify="center">
-                    <Text h3>
-                      {result?.metadata?.name} (
-                      {result?.confidence &&
-                        (result.confidence * 100).toFixed(2)}
-                      %)
-                    </Text>
-                  </Row>
-                </Col>
-              );
-            })}
-
-          {!results &&
-            [1, 2, 3].map((_, key) => {
-              return (
-                <Col key={key} css={{ justifyContent: "center" }}>
-                  <Row justify="center">
-                    <Card
-                      css={{
-                        height: "10vh",
-                        width: "10vw",
-                        verticalAlign: "middle",
-                        justifyContent: "center",
-                      }}
-                    >
-                      <Container>
+                        loading={"lazy"}
+                      ></Card.Image>
+                      <Card.Footer>
                         <Col>
-                          <Row justify="center">
-                            <Text h1>?</Text>
+                          <Row>
+                            <Text>
+                              Birthday:{" "}
+                              {result?.metadata?.birthday.replace(
+                                "None",
+                                "Unknown"
+                              )}
+                            </Text>
+                          </Row>
+                          <Row>
+                            <Text>
+                              Popularity: {result?.metadata?.popularity}
+                            </Text>
                           </Row>
                         </Col>
-                      </Container>
+                      </Card.Footer>
                     </Card>
                   </Row>
                 </Col>

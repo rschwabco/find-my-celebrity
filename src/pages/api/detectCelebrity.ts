@@ -5,6 +5,7 @@ import { getEmbeddings } from '../../huggingface'
 import { ScoredVector } from '@pinecone-database/pinecone/dist/pinecone-generated-ts'
 
 type Profile = {
+  id: string,
   birthday: string,
   name: string,
   place_of_birth: string,
@@ -40,6 +41,7 @@ export default async function handler(
     const queryResult: ScoredVector[] | undefined = await queryEmbedding({ values: embeddings, namespace: "" })
 
     const results: QueryResult[] | undefined = queryResult && queryResult?.map((result) => {
+      console.log("result.metadata", result)
       return {
         metadata: result.metadata as Profile,
         confidence: result.score

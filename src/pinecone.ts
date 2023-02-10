@@ -1,12 +1,6 @@
 import { PineconeClient, QueryRequest } from "@pinecone-database/pinecone";
 import { ScoredVector } from "@pinecone-database/pinecone/dist/pinecone-generated-ts";
-type Metadata = {
-  birthday: string,
-  name: string,
-  place_of_birth: string,
-  popularity: number,
-  profile_path: string,
-} | undefined
+
 
 let pineconeClient: PineconeClient = new PineconeClient();
 let initialized = false;
